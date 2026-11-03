@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARysu — Independent Creative Workshop</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parysu: {
+                            paper: '#FBF9F1',
+                            paperdark: '#F3EFE6',
+                            ink: '#2C2A29',
+                            sepia: '#8C6D53',
+                            rust: '#A64B2A',
+                            gold: '#C29B38',
+                            olive: '#556B2F',
+                            muted: '#6B6560'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF9F1;
+            color: #2C2A29;
+        }
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Vintage paper texture effect */
+        .paper-texture {
+            background-image: radial-gradient(rgba(140, 109, 83, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .stamp-border {
+            border: 2px dashed #8C6D53;
+        }
+    </style>
+</head>
+<body class="paper-texture min-h-screen flex flex-col selection:bg-parysu-rust selection:text-white">
+
+    <!-- Notification Banner (Custom Message Box replacement for alert) -->
+    <div id="notification-box" class="fixed top-6 right-6 z-50 transform translate-y-[-150%] transition-transform duration-300 ease-in-out max-w-md w-full bg-parysu-ink text-parysu-paper p-4 rounded-lg shadow-2xl border border-parysu-gold flex items-start gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-parysu-gold shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="flex-1">
+            <h5 id="notif-title" class="font-serif font-bold text-parysu-gold">Notice</h5>
+            <p id="notif-message" class="text-sm text-parysu-paperdark mt-1"></p>
+        </div>
+        <button onclick="hideNotification()" class="text-parysu-muted hover:text-parysu-paper">&times;</button>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-40 bg-[#FBF9F1]/90 backdrop-blur-md border-b border-parysu-sepia/20">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded bg-parysu-rust text-parysu-paper flex items-center justify-center font-serif font-bold text-xl shadow-sm group-hover:bg-parysu-sepia transition-colors">
+                    P
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-parysu-ink block leading-none">PARysu</span>
+                    <span class="text-xs uppercase tracking-widest text-parysu-sepia font-medium mt-1 block">Creative Workshop</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-parysu-muted">
+                <a href="#about" class="hover:text-parysu-rust transition-colors">About Workshop</a>
+                <a href="#services" class="hover:text-parysu-rust transition-colors">Services</a>
+                <a href="#portfolio" class="hover:text-parysu-rust transition-colors">Portfolio</a>
+                <a href="#booking" class="hover:text-parysu-rust transition-colors">Inquire & Book</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <a href="#booking" class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-parysu-paper text-sm font-medium transition-all shadow-sm">
+                    Start a Project
+                </a>
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-parysu-ink p-2 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-parysu-paperdark border-b border-parysu-sepia/20 px-6 py-4 space-y-3">
+            <a href="#about" onclick="toggleMobileMenu()" class="block text-parysu-ink hover:text-parysu-rust font-medium">About Workshop</a>
+            <a href="#services" onclick="toggleMobileMenu()" class="block text-parysu-ink hover:text-parysu-rust font-medium">Services</a>
+            <a href="#portfolio" onclick="toggleMobileMenu()" class="block text-parysu-ink hover:text-parysu-rust font-medium">Portfolio</a>
+            <a href="#booking" onclick="toggleMobileMenu()" class="block text-parysu-ink hover:text-parysu-rust font-medium">Inquire & Book</a>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden py-20 md:py-32 px-6 border-b border-parysu-sepia/15">
+            <div class="max-w-5xl mx-auto text-center relative z-10">
+                <span class="inline-block py-1 px-3 rounded-full bg-parysu-sepia/10 text-parysu-sepia text-xs font-semibold uppercase tracking-widest mb-6 border border-parysu-sepia/20">
+                    Independent Creative Workshop
+                </span>
+                <h1 class="font-serif text-4xl sm:text-6xl md:text-7xl font-bold text-parysu-ink tracking-tight mb-6 leading-tight">
+                    Good Ideas Deserve <br><span class="italic text-parysu-rust font-normal">Good Work.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-parysu-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Welcome to PARysu. We are an independent creative workshop offering thoughtful design, meticulous research, academic assistance, and customized creative services for individuals, startups, and projects.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#services" class="w-full sm:w-auto px-8 py-4 rounded bg-parysu-rust text-parysu-paper font-medium hover:bg-parysu-sepia transition-all shadow-md">
+                        Explore Our Services
+                    </a>
+                    <a href="#about" class="w-full sm:w-auto px-8 py-4 rounded border border-parysu-sepia/40 text-parysu-ink font-medium hover:bg-parysu-paperdark transition-all">
+                        Our Workshop Philosophy
+                    </a>
+                </div>
+
+                <!-- Workshop Stamp / Seal Graphic Simulation -->
+                <div class="mt-16 inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-parysu-sepia/30 bg-white/60 text-xs font-mono text-parysu-sepia">
+                    <span class="w-2 h-2 rounded-full bg-parysu-rust animate-pulse"></span>
+                    <span>Crafted with care • Independent &amp; Personalised Service</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Positioning Section -->
+        <section id="about" class="py-20 px-6 bg-parysu-paperdark/50 border-b border-parysu-sepia/15">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-parysu-ink mb-4">Not a Large Corporate Agency</h2>
+                    <div class="w-16 h-1 bg-parysu-rust mx-auto rounded"></div>
+                </div>
+                <div class="bg-white p-8 md:p-12 rounded-xl border border-parysu-sepia/20 shadow-sm relative">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 bg-parysu-gold/20 rounded-full flex items-center justify-center border border-parysu-gold">
+                        <span class="font-serif text-parysu-ink font-bold">§</span>
+                    </div>
+                    <p class="text-base md:text-lg text-parysu-ink leading-relaxed mb-6">
+                        PARysu is an independent creative workshop where people can bring ideas, requirements and projects and receive thoughtful, personalized service. We believe in direct collaboration, transparent communication, and meticulous craftsmanship without unnecessary bureaucratic layers.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-parysu-sepia/10 text-center">
+                        <div>
+                            <h4 class="font-serif font-bold text-parysu-rust text-lg mb-1">Thoughtful Design</h4>
+                            <p class="text-sm text-parysu-muted">Purposeful aesthetics built around your unique identity and message.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-serif font-bold text-parysu-rust text-lg mb-1">Rigor &amp; Research</h4>
+                            <p class="text-sm text-parysu-muted">Evidence-based structuring, document layout, and academic support.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-serif font-bold text-parysu-rust text-lg mb-1">Tailored Solutions</h4>
+                            <p class="text-sm text-parysu-muted">Customized creative work tailored specifically to your exact needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-20 px-6 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs uppercase tracking-widest text-parysu-rust font-semibold">What We Offer</span>
+                <h2 class="font-serif text-4xl font-bold text-parysu-ink mt-2 mb-4">Our Service Categories</h2>
+                <p class="text-parysu-muted">Explore our five core service pillars designed to bring clarity, visual distinction, and structure to your projects.</p>
+            </div>
+
+            <!-- 5 Distinct Service Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Service 1: Logo & Brand Design -->
+                <div class="bg-white rounded-xl border border-parysu-sepia/20 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden group">
+                    <div class="h-48 bg-[#F5EFEB] relative flex items-center justify-center border-b border-parysu-sepia/15 overflow-hidden">
+                        <!-- Vintage-inspired SVG Illustration -->
+                        <svg class="w-24 h-24 text-parysu-sepia group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="50" cy="50" r="35" stroke-dasharray="4 4" />
+                            <polygon points="50,20 65,45 80,50 65,55 50,80 35,55 20,50 35,45" fill="currentColor" fill-opacity="0.1" />
+                            <circle cx="50" cy="50" r="10" fill="currentColor" />
+                        </svg>
+                        <span class="absolute top-3 left-3 text-xs font-mono bg-parysu-paper px-2 py-1 rounded border border-parysu-sepia/20 text-parysu-sepia">01</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <h3 class="font-serif text-2xl font-bold text-parysu-ink mb-3">Logo &amp; Brand Design</h3>
+                        <p class="text-sm text-parysu-muted mb-6 leading-relaxed">
+                            Help individuals, startups and small businesses establish their visual identity with professional branding foundations.
+                        </p>
+                        <div class="mt-auto">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-parysu-sepia mb-2">Key Deliverables:</h4>
+                            <ul class="text-xs text-parysu-ink space-y-1.5 mb-6">
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Custom logo design</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Brand identity concepts</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Typography and color selection</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Business cards &amp; basic materials</li>
+                            </ul>
+                            <button onclick="selectService('Logo & Brand Design')" class="w-full py-2.5 px-4 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-white text-sm font-medium transition-colors text-center">
+                                Request This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2: Posters & Graphic Design -->
+                <div class="bg-white rounded-xl border border-parysu-sepia/20 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden group">
+                    <div class="h-48 bg-[#F5EFEB] relative flex items-center justify-center border-b border-parysu-sepia/15 overflow-hidden">
+                        <svg class="w-24 h-24 text-parysu-rust group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="25" y="20" width="50" height="60" rx="3" fill="currentColor" fill-opacity="0.08" />
+                            <line x1="35" y1="35" x2="65" y2="35" stroke-width="3" />
+                            <line x1="35" y1="48" x2="55" y2="48" />
+                            <line x1="35" y1="58" x2="65" y2="58" />
+                            <circle cx="50" cy="70" r="4" fill="currentColor" />
+                        </svg>
+                        <span class="absolute top-3 left-3 text-xs font-mono bg-parysu-paper px-2 py-1 rounded border border-parysu-sepia/20 text-parysu-sepia">02</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <h3 class="font-serif text-2xl font-bold text-parysu-ink mb-3">Posters &amp; Graphic Design</h3>
+                        <p class="text-sm text-parysu-muted mb-6 leading-relaxed">
+                            Creative visual communication tailored for personal, professional, and promotional requirements.
+                        </p>
+                        <div class="mt-auto">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-parysu-sepia mb-2">Key Deliverables:</h4>
+                            <ul class="text-xs text-parysu-ink space-y-1.5 mb-6">
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Promotional posters &amp; flyers</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Social media graphics</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Event posters &amp; invitations</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Creative custom layouts</li>
+                            </ul>
+                            <button onclick="selectService('Posters & Graphic Design')" class="w-full py-2.5 px-4 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-white text-sm font-medium transition-colors text-center">
+                                Request This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3: Academic Assistance -->
+                <div class="bg-white rounded-xl border border-parysu-sepia/20 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden group">
+                    <div class="h-48 bg-[#F5EFEB] relative flex items-center justify-center border-b border-parysu-sepia/15 overflow-hidden">
+                        <svg class="w-24 h-24 text-parysu-sepia group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 30L50 15L80 30L50 45L20 30Z" fill="currentColor" fill-opacity="0.1" />
+                            <path d="M30 43V65C30 70 50 75 50 75C50 75 70 70 70 65V43" />
+                            <line x1="75" y1="35" x2="75" y2="60" />
+                        </svg>
+                        <span class="absolute top-3 left-3 text-xs font-mono bg-parysu-paper px-2 py-1 rounded border border-parysu-sepia/20 text-parysu-sepia">03</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <h3 class="font-serif text-2xl font-bold text-parysu-ink mb-3">Academic Assistance</h3>
+                        <p class="text-sm text-parysu-muted mb-6 leading-relaxed">
+                            Provide structured academic support to students supporting learning and adhering strictly to institutional guidelines.
+                        </p>
+                        <div class="mt-auto">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-parysu-sepia mb-2">Key Deliverables:</h4>
+                            <ul class="text-xs text-parysu-ink space-y-1.5 mb-6">
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Assignment formatting &amp; presentation</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Project documentation</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Presentation &amp; PPT design</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Proofreading &amp; notes organization</li>
+                            </ul>
+                            <button onclick="selectService('Academic Assistance')" class="w-full py-2.5 px-4 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-white text-sm font-medium transition-colors text-center">
+                                Request This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4: Research & Documentation -->
+                <div class="bg-white rounded-xl border border-parysu-sepia/20 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden group lg:col-span-1.5">
+                    <div class="h-48 bg-[#F5EFEB] relative flex items-center justify-center border-b border-parysu-sepia/15 overflow-hidden">
+                        <svg class="w-24 h-24 text-parysu-rust group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="45" cy="45" r="20" fill="currentColor" fill-opacity="0.08" />
+                            <line x1="60" y1="60" x2="78" y2="78" stroke-width="3" stroke-linecap="round" />
+                            <line x1="38" y1="45" x2="52" y2="45" />
+                            <line x1="45" y1="38" x2="45" y2="52" />
+                        </svg>
+                        <span class="absolute top-3 left-3 text-xs font-mono bg-parysu-paper px-2 py-1 rounded border border-parysu-sepia/20 text-parysu-sepia">04</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <h3 class="font-serif text-2xl font-bold text-parysu-ink mb-3">Research &amp; Documentation</h3>
+                        <p class="text-sm text-parysu-muted mb-6 leading-relaxed">
+                            Research-oriented services focused on evidence-based collection, verification, literature reviews, and structured reporting.
+                        </p>
+                        <div class="mt-auto">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-parysu-sepia mb-2">Key Deliverables:</h4>
+                            <ul class="text-xs text-parysu-ink space-y-1.5 mb-6">
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Topic-based research &amp; information gathering</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Comprehensive research reports</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Literature reviews &amp; citations</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Structured data organization</li>
+                            </ul>
+                            <button onclick="selectService('Research & Documentation')" class="w-full py-2.5 px-4 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-white text-sm font-medium transition-colors text-center">
+                                Request This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 5: Creative & Custom Work -->
+                <div class="bg-white rounded-xl border border-parysu-sepia/20 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden group lg:col-span-1.5">
+                    <div class="h-48 bg-[#F5EFEB] relative flex items-center justify-center border-b border-parysu-sepia/15 overflow-hidden">
+                        <svg class="w-24 h-24 text-parysu-sepia group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M50 20C33.43 20 20 33.43 20 50C20 66.57 33.43 80 50 80C66.57 80 80 66.57 80 50C80 33.43 66.57 20 50 20Z" fill="currentColor" fill-opacity="0.08" />
+                            <path d="M35 50L45 60L65 40" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="absolute top-3 left-3 text-xs font-mono bg-parysu-paper px-2 py-1 rounded border border-parysu-sepia/20 text-parysu-sepia">05</span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <h3 class="font-serif text-2xl font-bold text-parysu-ink mb-3">Creative &amp; Custom Work</h3>
+                        <p class="text-sm text-parysu-muted mb-6 leading-relaxed">
+                            For unique projects that do not fit standard boxes. Bring your special client requests and bespoke creative concepts.
+                        </p>
+                        <div class="mt-auto">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-parysu-sepia mb-2">Key Deliverables:</h4>
+                            <ul class="text-xs text-parysu-ink space-y-1.5 mb-6">
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Custom creative concepts</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Digital creative &amp; content development</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Customized visual materials</li>
+                                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-parysu-rust"></span> Special project client requests</li>
+                            </ul>
+                            <button onclick="selectService('Creative & Custom Work')" class="w-full py-2.5 px-4 rounded border border-parysu-rust text-parysu-rust hover:bg-parysu-rust hover:text-white text-sm font-medium transition-colors text-center">
+                                Request This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Portfolio Showcase Section -->
+        <section id="portfolio" class="py-20 px-6 bg-parysu-paperdark/40 border-t border-b border-parysu-sepia/15">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                    <div>
+                        <span class="text-xs uppercase tracking-widest text-parysu-rust font-semibold">Workshop Archive</span>
+                        <h2 class="font-serif text-4xl font-bold text-parysu-ink mt-2">Selected Creative Works</h2>
+                    </div>
+                    <p class="text-sm text-parysu-muted max-w-md mt-4 md:mt-0">
+                        Showcasing a variety of design, research, layout, and custom projects. Clearly distinguishing actual client projects from self-initiated sample work.
+                    </p>
+                </div>
+
+                <!-- Portfolio Filters -->
+                <div class="flex flex-wrap gap-2 mb-8 border-b border-parysu-sepia/15 pb-4">
+                    <button onclick="filterPortfolio('all')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-parysu-ink text-parysu-paper transition-all">All Works</button>
+                    <button onclick="filterPortfolio('branding')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-white text-parysu-muted hover:text-parysu-ink border border-parysu-sepia/20 transition-all">Logo &amp; Branding</button>
+                    <button onclick="filterPortfolio('graphics')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-white text-parysu-muted hover:text-parysu-ink border border-parysu-sepia/20 transition-all">Posters &amp; Graphics</button>
+                    <button onclick="filterPortfolio('academic')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-white text-parysu-muted hover:text-parysu-ink border border-parysu-sepia/20 transition-all">Academic Layouts</button>
+                    <button onclick="filterPortfolio('research')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-white text-parysu-muted hover:text-parysu-ink border border-parysu-sepia/20 transition-all">Research Reports</button>
+                    <button onclick="filterPortfolio('custom')" class="portfolio-filter px-4 py-2 rounded text-xs font-medium bg-white text-parysu-muted hover:text-parysu-ink border border-parysu-sepia/20 transition-all">Custom Projects</button>
+                </div>
+
+                <!-- Portfolio Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolio-grid">
+                    
+                    <!-- Item 1 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="branding">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-rust text-white font-medium uppercase">Client Project</span>
+                            <span class="text-xs font-mono text-parysu-sepil">LOGOTYPE &amp; IDENTITY</span>
+                            <div class="text-center">
+                                <span class="font-serif text-3xl font-bold tracking-widest text-parysu-ink">ATELIER V</span>
+                                <span class="block text-xs uppercase tracking-widest text-parysu-muted mt-1">Craftsmanship &amp; Goods</span>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Brand Kit &amp; Cards</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Atelier V Brand Identity</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Complete visual identity design featuring minimalist typography, earthy tone palette, and bespoke business stationery.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Logo &amp; Brand Design</span>
+                                <span class="text-parysu-muted">Verified Client</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="graphics">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-sepia text-white font-medium uppercase">Sample Work</span>
+                            <span class="text-xs font-mono text-parysu-sepia">PROMOTIONAL POSTER</span>
+                            <div class="text-center py-2 border-y border-parysu-ink/20">
+                                <span class="font-serif text-xl font-bold uppercase tracking-wide text-parysu-rust">Autumn Jazz Evening</span>
+                                <span class="block text-[10px] uppercase text-parysu-ink mt-0.5">Live Acoustic Session</span>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Event Poster &amp; Banner</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Acoustic Concert Poster</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Vintage typographic poster design highlighting warm color grading, custom grid layout, and digital promotion assets.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Posters &amp; Graphics</span>
+                                <span class="text-parysu-muted">Self-Initiated</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="academic">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-rust text-white font-medium uppercase">Client Project</span>
+                            <span class="text-xs font-mono text-parysu-sepia">ACADEMIC LAYOUT</span>
+                            <div class="bg-white p-3 rounded shadow-inner border border-parysu-sepia/20">
+                                <div class="w-3/4 h-2 bg-parysu-ink/20 rounded mb-2"></div>
+                                <div class="w-full h-1.5 bg-parysu-ink/10 rounded mb-1"></div>
+                                <div class="w-5/6 h-1.5 bg-parysu-ink/10 rounded"></div>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Formatted Thesis Document</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Structured Project Presentation</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Professional formatting, bibliography styling, chart organization, and academic presentation slide deck design.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Academic Assistance</span>
+                                <span class="text-parysu-muted">Verified Client</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="research">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-sepia text-white font-medium uppercase">Sample Work</span>
+                            <span class="text-xs font-mono text-parysu-sepia">RESEARCH REPORT</span>
+                            <div class="bg-white p-3 rounded border border-parysu-sepia/20">
+                                <div class="flex justify-between items-center text-[10px] font-mono text-parysu-rust mb-1">
+                                    <span>DATA SYNTHESIS</span>
+                                    <span>100% Verified</span>
+                                </div>
+                                <div class="w-full h-8 bg-parysu-sepia/10 rounded flex items-end px-2 gap-1">
+                                    <div class="w-1/4 h-3/4 bg-parysu-sepia rounded-t"></div>
+                                    <div class="w-1/4 h-1/2 bg-parysu-rust rounded-t"></div>
+                                    <div class="w-1/4 h-full bg-parysu-gold rounded-t"></div>
+                                    <div class="w-1/4 h-2/3 bg-parysu-ink rounded-t"></div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Evidence-Based Report</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Urban Architecture Literature Review</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Comprehensive information gathering, credible source verification, structured literature review, and visual data organization.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Research &amp; Documentation</span>
+                                <span class="text-parysu-muted">Self-Initiated</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 5 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="custom">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-rust text-white font-medium uppercase">Client Project</span>
+                            <span class="text-xs font-mono text-parysu-sepia">BESPOKE CONCEPT</span>
+                            <div class="text-center">
+                                <span class="font-serif italic text-2xl text-parysu-rust">Custom Manuscript</span>
+                                <span class="block text-[10px] uppercase text-parysu-muted mt-1">Special Client Commission</span>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Custom Document Design</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Custom Poetry Booklet Layout</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Bespoke document design, curated typography, and customized visual page materials created for a special private client requirement.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Creative &amp; Custom Work</span>
+                                <span class="text-parysu-muted">Verified Client</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 6 -->
+                    <div class="portfolio-item bg-white rounded-lg overflow-hidden border border-parysu-sepia/20 shadow-sm flex flex-col" data-category="graphics">
+                        <div class="h-52 bg-[#EFECE6] p-6 flex flex-col justify-between relative">
+                            <span class="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded bg-parysu-rust text-white font-medium uppercase">Client Project</span>
+                            <span class="text-xs font-mono text-parysu-sepia">SOCIAL GRAPHICS</span>
+                            <div class="flex justify-center gap-2">
+                                <div class="w-12 h-12 bg-parysu-rust rounded flex items-center justify-center text-white font-serif font-bold">#1</div>
+                                <div class="w-12 h-12 bg-parysu-sepia rounded flex items-center justify-center text-white font-serif font-bold">#2</div>
+                            </div>
+                            <span class="text-[10px] text-parysu-muted font-mono">Deliverable: Social Media Kit</span>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-lg text-parysu-ink mb-1">Artisan Bakery Campaign Graphics</h3>
+                                <p class="text-xs text-parysu-muted leading-relaxed">Engaging promotional graphics and story templates crafted for a local independent culinary brand.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-parysu-sepia/10 flex items-center justify-between text-xs font-medium text-parysu-rust">
+                                <span>Posters &amp; Graphics</span>
+                                <span class="text-parysu-muted">Verified Client</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Booking & Inquiry Section -->
+        <section id="booking" class="py-20 px-6 max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <span class="text-xs uppercase tracking-widest text-parysu-rust font-semibold">Start Your Collaboration</span>
+                <h2 class="font-serif text-4xl font-bold text-parysu-ink mt-2 mb-4">Request a Service</h2>
+                <p class="text-parysu-muted">Share your project details with us below. We review every inquiry personally and respond promptly with tailored workshop options.</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-xl border border-parysu-sepia/20 shadow-sm relative">
+                <form id="inquiry-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Customer Name -->
+                        <div>
+                            <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Your Name <span class="text-parysu-rust">*</span></label>
+                            <input type="text" id="name" required class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm" placeholder="e.g., Eleanor Vance">
+                        </div>
+
+                        <!-- Email Address -->
+                        <div>
+                            <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Email Address <span class="text-parysu-rust">*</span></label>
+                            <input type="email" id="email" required class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm" placeholder="e.g., eleanor@example.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Selected Service -->
+                        <div>
+                            <label for="service-select" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Selected Service <span class="text-parysu-rust">*</span></label>
+                            <select id="service-select" required class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm">
+                                <option value="" disabled selected>Select a service category...</option>
+                                <option value="Logo & Brand Design">1. Logo &amp; Brand Design</option>
+                                <option value="Posters & Graphic Design">2. Posters &amp; Graphic Design</option>
+                                <option value="Academic Assistance">3. Academic Assistance</option>
+                                <option value="Research & Documentation">4. Research &amp; Documentation</option>
+                                <option value="Creative & Custom Work">5. Creative &amp; Custom Work</option>
+                            </select>
+                        </div>
+
+                        <!-- Expected Deadline -->
+                        <div>
+                            <label for="deadline" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Expected Deadline <span class="text-parysu-rust">*</span></label>
+                            <input type="date" id="deadline" required class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Approximate Budget -->
+                        <div>
+                            <label for="budget" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Approximate Budget (Optional)</label>
+                            <input type="text" id="budget" class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm" placeholder="e.g., $300 - $500 or Flexible">
+                        </div>
+
+                        <!-- Reference Links -->
+                        <div>
+                            <label for="links" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Reference Links / Moodboard (Optional)</label>
+                            <input type="text" id="links" class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm" placeholder="e.g., https://behance.net/... or reference notes">
+                        </div>
+                    </div>
+
+                    <!-- Project Description -->
+                    <div>
+                        <label for="description" class="block text-xs font-semibold uppercase tracking-wider text-parysu-ink mb-2">Project Description &amp; Specific Requirements <span class="text-parysu-rust">*</span></label>
+                        <textarea id="description" rows="5" required class="w-full px-4 py-3 rounded border border-parysu-sepia/30 bg-parysu-paper/50 focus:outline-none focus:border-parysu-rust text-parysu-ink text-sm" placeholder="Describe your project, goals, deliverables needed, and any specific preferences..."></textarea>
+                    </div>
+
+                    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p class="text-xs text-parysu-muted">
+                            <span class="font-semibold text-parysu-ink">Note:</span> Academic requests must adhere strictly to institutional rules and learning support standards.
+                        </p>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded bg-parysu-rust text-parysu-paper font-medium hover:bg-parysu-sepia transition-all shadow-md">
+                            Send Project Inquiry
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Inquiry Preview Box (Hidden by default, shown upon successful form preparation) -->
+                <div id="email-preview-container" class="hidden mt-10 pt-8 border-t border-parysu-sepia/20">
+                    <div class="bg-parysu-paperdark p-6 rounded-lg border border-parysu-sepia/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-serif font-bold text-lg text-parysu-ink flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-parysu-rust" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                Prepared Email Inquiry
+                            </h3>
+                            <button onclick="copyEmailDraft()" class="text-xs font-medium px-3 py-1.5 rounded bg-white border border-parysu-sepia/30 hover:bg-parysu-rust hover:text-white transition-colors">
+                                Copy Email Draft
+                            </button>
+                        </div>
+                        <pre id="email-draft-text" class="text-xs font-mono text-parysu-ink bg-white p-4 rounded border border-parysu-sepia/20 overflow-x-auto whitespace-pre-wrap"></pre>
+                        <p class="text-xs text-parysu-muted mt-3">
+                            Your inquiry has been successfully formatted for PARysu workshop dispatch. You can copy this draft to send via your preferred email client to <strong class="text-parysu-ink">inquiries@parysu.workshop</strong>.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-parysu-ink text-parysu-paper py-16 px-6 border-t border-parysu-gold/30">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div class="md:col-span-1.5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-parysu-rust text-parysu-paper flex items-center justify-center font-serif font-bold text-lg">
+                        P
+                    </div>
+                    <span class="font-serif text-2xl font-bold tracking-tight text-white">PARysu</span>
+                </div>
+                <p class="text-sm text-parysu-paperdark/80 mb-4 leading-relaxed">
+                    Independent creative workshop providing design, research, academic assistance, and customized creative services.
+                </p>
+                <p class="text-xs italic text-parysu-gold font-serif">
+                    "Good Ideas Deserve Good Work."
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-sm uppercase tracking-wider text-parysu-gold mb-4">Workshop Services</h4>
+                <ul class="space-y-2 text-xs text-parysu-paperdark/80">
+                    <li><a href="#services" class="hover:text-white transition-colors">Logo &amp; Brand Design</a></li>
+                    <li><a href="#services" class="hover:text-white transition-colors">Posters &amp; Graphic Design</a></li>
+                    <li><a href="#services" class="hover:text-white transition-colors">Academic Assistance</a></li>
+                    <li><a href="#services" class="hover:text-white transition-colors">Research &amp; Documentation</a></li>
+                    <li><a href="#services" class="hover:text-white transition-colors">Creative &amp; Custom Work</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-sm uppercase tracking-wider text-parysu-gold mb-4">Navigation</h4>
+                <ul class="space-y-2 text-xs text-parysu-paperdark/80">
+                    <li><a href="#about" class="hover:text-white transition-colors">About Workshop</a></li>
+                    <li><a href="#services" class="hover:text-white transition-colors">Service Pillars</a></li>
+                    <li><a href="#portfolio" class="hover:text-white transition-colors">Portfolio Archive</a></li>
+                    <li><a href="#booking" class="hover:text-white transition-colors">Inquire &amp; Book</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-sm uppercase tracking-wider text-parysu-gold mb-4">Workshop Ethos</h4>
+                <p class="text-xs text-parysu-paperdark/80 leading-relaxed mb-3">
+                    Every project receives personalized attention without corporate layers. All academic and research work strictly supports learning and honest scholarship.
+                </p>
+                <span class="text-[11px] font-mono text-parysu-gold bg-parysu-gold/10 px-2.5 py-1 rounded border border-parysu-gold/20 inline-block">
+                    Independent &amp; Direct
+                </span>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-parysu-paperdark/60">
+            <p>&copy; 2026 PARysu Creative Workshop. All rights reserved.</p>
+            <p class="mt-2 sm:mt-0 font-mono">Good Ideas Deserve Good Work.</p>
+        </div>
+    </footer>
+
+    <!-- Interactive JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Custom Notification Box (replacing alert)
+        function showNotification(title, message) {
+            const box = document.getElementById('notification-box');
+            const titleEl = document.getElementById('notif-title');
+            const msgEl = document.getElementById('notif-message');
+            
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            
+            box.classList.remove('translate-y-[-150%]');
+            box.classList.add('translate-y-0');
+            
+            setTimeout(() => {
+                hideNotification();
+            }, 6000);
+        }
+
+        function hideNotification() {
+            const box = document.getElementById('notification-box');
+            box.classList.remove('translate-y-0');
+            box.classList.add('translate-y-[-150%]');
+        }
+
+        // Service selection routing to booking form
+        function selectService(serviceName) {
+            const selectEl = document.getElementById('service-select');
+            selectEl.value = serviceName;
+            
+            // Smooth scroll to booking section
+            const bookingSection = document.getElementById('booking');
+            bookingSection.scrollIntoView({ behavior: 'smooth' });
+
+            showNotification('Service Selected', `You have selected "${serviceName}". Please fill out the project details below to dispatch your inquiry.`);
+        }
+
+        // Portfolio Filter Functionality
+        function filterPortfolio(category) {
+            const items = document.querySelectorAll('.portfolio-item');
+            const buttons = document.querySelectorAll('.portfolio-filter');
+
+            // Update active button styles
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-parysu-ink', 'text-parysu-paper');
+                btn.classList.add('bg-white', 'text-parysu-muted', 'border', 'border-parysu-sepia/20');
+            });
+            event.target.classList.remove('bg-white', 'text-parysu-muted', 'border', 'border-parysu-sepia/20');
+            event.target.classList.add('bg-parysu-ink', 'text-parysu-paper');
+
+            // Filter items
+            items.forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Form Submission & Email Inquiry Preparation
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const service = document.getElementById('service-select').value;
+            const deadline = document.getElementById('deadline').value;
+            const budget = document.getElementById('budget').value || 'Not specified';
+            const links = document.getElementById('links').value || 'None provided';
+            const description = document.getElementById('description').value;
+
+            // Construct email inquiry text
+            const emailContent = `To: inquiries@parysu.workshop
+Subject: New Project Inquiry: ${service} - [${name}]
+
+Dear PARysu Workshop Team,
+
+I would like to request your services for my upcoming project. Here are the submitted details:
+
+--------------------------------------------------
+CUSTOMER INFORMATION:
+- Name: ${name}
+- Email Address: ${email}
+
+PROJECT DETAILS:
+- Selected Service: ${service}
+- Expected Deadline: ${deadline}
+- Approximate Budget: ${budget}
+- Reference Links / Requirements: ${links}
+
+PROJECT DESCRIPTION:
+${description}
+--------------------------------------------------
+
+Looking forward to your thoughtful response and workshop availability.
+
+Warm regards,
+${name}`;
+
+            // Display in email preview container
+            const previewContainer = document.getElementById('email-preview-container');
+            const draftTextEl = document.getElementById('email-draft-text');
+            
+            draftTextEl.textContent = emailContent;
+            previewContainer.classList.remove('hidden');
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+
+            showNotification('Inquiry Prepared Successfully', 'Your project inquiry has been formatted into a workshop email draft below!');
+        }
+
+        // Clipboard Copy using document.execCommand as required by constraints
+        function copyEmailDraft() {
+            const draftText = document.getElementById('email-draft-text').textContent;
+            const textArea = document.createElement('textarea');
+            textArea.value = draftText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showNotification('Copied to Clipboard', 'The email inquiry draft has been successfully copied to your clipboard.');
+            } catch (err) {
+                showNotification('Copy Failed', 'Unable to copy automatically. Please select and copy manually.');
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
